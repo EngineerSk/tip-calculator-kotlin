@@ -50,6 +50,8 @@ class MainActivity : AppCompatActivity() {
         val buttonMinus = findViewById<MaterialButton>(R.id.buttonMinus)
         val buttonMultiply = findViewById<MaterialButton>(R.id.buttonMultiply)
         val buttonDivide = findViewById<MaterialButton>(R.id.buttonDivide)
+        val buttonNeg = findViewById<MaterialButton>(R.id.negButton)
+        val buttonClear = findViewById<MaterialButton>(R.id.clearButton)
 
         val listener = View.OnClickListener { view ->
             val button: MaterialButton = view as MaterialButton
@@ -67,6 +69,27 @@ class MainActivity : AppCompatActivity() {
         button8.setOnClickListener(listener)
         button9.setOnClickListener(listener)
         buttonDot.setOnClickListener(listener)
+        buttonNeg.setOnClickListener {
+            val value = mNewNumberInputEditText.text.toString()
+            if (value.isEmpty())
+                mNewNumberInputEditText.setText("-")
+            else {
+                try {
+                    var doubleValue = value.toDouble()
+                    doubleValue *= -1
+                    mNewNumberInputEditText.setText(doubleValue.toString())
+                } catch (e: NumberFormatException) {
+                    mNewNumberInputEditText.setText("")
+                }
+            }
+        }
+
+        buttonClear.setOnClickListener{
+            mResultTextInputEditText.setText("0.0")
+            mNewNumberInputEditText.setText("")
+            mDisplayOperation.text = "="
+            mOperand1 = 0.0
+        }
 
         val opListener = View.OnClickListener { view ->
             val button: MaterialButton = view as MaterialButton
