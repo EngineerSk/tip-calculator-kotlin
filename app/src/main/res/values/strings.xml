@@ -16,4 +16,6 @@
     <string name="_3">3</string>
     <string name="_0">0</string>
     <string name="point">.</string>
+    <string name="neg">neg</string>
+    <string name="clear">clear</string>
 </resources>

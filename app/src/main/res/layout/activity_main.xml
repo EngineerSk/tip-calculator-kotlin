@@ -22,8 +22,9 @@
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/resultInputEditText"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintWidth_percent="0.75"
+        app:layout_constraintDimensionRatio="3:1"
         android:inputType="numberSigned|numberDecimal"
         android:textAlignment="center"
         android:focusable="false"
@@ -65,8 +66,9 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/rightOperandInputEditText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             app:layout_constraintWidth_percent="0.75"
+            app:layout_constraintDimensionRatio="3:1"
             android:inputType="numberSigned|numberDecimal"
             android:textAlignment="center"
             app:layout_constraintEnd_toStartOf="@id/rightOperandInputLayoutMarginEnd"
@@ -107,6 +109,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/buttonLayoutTopMargin"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintWidth_percent="0.92">
 
         <include layout="@layout/calc_button_layout" />
