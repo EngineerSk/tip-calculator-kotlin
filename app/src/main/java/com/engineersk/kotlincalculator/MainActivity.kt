@@ -3,13 +3,11 @@ package com.engineersk.kotlincalculator
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.engineersk.kotlincalculator.viewmodels.CalculatorViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
-
-private const val STATE_PENDING_OPERATION = "PendingOperation"
-private const val STATE_OPERAND1 = "Operand1"
-private const val STATE_OPERAND1_STORED = "Operand1_Stored"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mResultTextInputEditText: TextInputEditText
@@ -20,17 +18,25 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    // variables to hold the operands and type of calculations
-    private var mOperand1: Double? = null
-    private var mOperand2: Double = 0.0
-    private var pendingOperator: String = "="
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mResultTextInputEditText = findViewById(R.id.resultInputEditText)
         mNewNumberInputEditText = findViewById(R.id.rightOperandInputEditText)
+        val viewModel = ViewModelProvider(this).get(CalculatorViewModel::class.java)
 
+        viewModel.stringResult.observe(this, { stringResult ->
+            mResultTextInputEditText.setText(stringResult)
+        })
+
+        viewModel.stringNewNumber.observe(this, { stringNumber ->
+            mNewNumberInputEditText.setText(stringNumber)
+        })
+
+        viewModel.stringDisplayOperation.observe(this, { stringOperation ->
+            mDisplayOperation.text = stringOperation
+        })
         // Data input buttons
         val button0: MaterialButton = findViewById(R.id.button0)
         val button1: MaterialButton = findViewById(R.id.button1)
@@ -54,8 +60,7 @@ class MainActivity : AppCompatActivity() {
         val buttonClear = findViewById<MaterialButton>(R.id.clearButton)
 
         val listener = View.OnClickListener { view ->
-            val button: MaterialButton = view as MaterialButton
-            mNewNumberInputEditText.append(button.text)
+            viewModel.digitPressed((view as MaterialButton).text.toString())
         }
 
         button0.setOnClickListener(listener)
@@ -70,39 +75,15 @@ class MainActivity : AppCompatActivity() {
         button9.setOnClickListener(listener)
         buttonDot.setOnClickListener(listener)
         buttonNeg.setOnClickListener {
-            val value = mNewNumberInputEditText.text.toString()
-            if (value.isEmpty())
-                mNewNumberInputEditText.setText("-")
-            else {
-                try {
-                    var doubleValue = value.toDouble()
-                    doubleValue *= -1
-                    mNewNumberInputEditText.setText(doubleValue.toString())
-                } catch (e: NumberFormatException) {
-                    mNewNumberInputEditText.setText("")
-                }
-            }
+            viewModel.negPressed()
         }
 
-        buttonClear.setOnClickListener{
-            mResultTextInputEditText.setText("0.0")
-            mNewNumberInputEditText.setText("")
-            mDisplayOperation.text = "="
-            mOperand1 = 0.0
+        buttonClear.setOnClickListener {
+            viewModel.clearPressed()
         }
 
         val opListener = View.OnClickListener { view ->
-            val button: MaterialButton = view as MaterialButton
-            val operator = button.text.toString()
-
-            try {
-                val value = mNewNumberInputEditText.text.toString().toDouble()
-                performOperation(operator, value)
-            } catch (e: NumberFormatException) {
-                mNewNumberInputEditText.setText("")
-            }
-            pendingOperator = operator
-            mDisplayOperation.text = pendingOperator
+            viewModel.operandPressed((view as MaterialButton).text.toString())
         }
 
         buttonEquals.setOnClickListener(opListener)
@@ -110,53 +91,5 @@ class MainActivity : AppCompatActivity() {
         buttonMultiply.setOnClickListener(opListener)
         buttonMinus.setOnClickListener(opListener)
         buttonPlus.setOnClickListener(opListener)
-    }
-
-    private fun performOperation(operator: String, value: Double) {
-
-        mDisplayOperation.text = operator
-        if (mOperand1 == null) {
-            mOperand1 = value
-        } else {
-            mOperand2 = value
-            if (pendingOperator == "=") {
-                pendingOperator = operator
-            }
-            mOperand1 = when (pendingOperator) {
-                "=" -> mOperand2
-                "/" -> {
-                    if (mOperand2 == 0.0) {
-                        Double.NaN
-                    } else {
-                        mOperand1!! / mOperand2
-                    }
-                }
-                "*" -> mOperand1!! * mOperand2
-                "+" -> mOperand1!! + mOperand2
-                else -> mOperand1!! - mOperand2
-            }
-        }
-
-        mResultTextInputEditText.setText(mOperand1.toString())
-        mNewNumberInputEditText.setText("")
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (mOperand1 != null) {
-            outState.putDouble(STATE_OPERAND1, mOperand1!!)
-            outState.putBoolean(STATE_OPERAND1_STORED, true)
-        }
-
-        outState.putString(STATE_PENDING_OPERATION, pendingOperator)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        mOperand1 = if (savedInstanceState.getBoolean(STATE_OPERAND1_STORED, false))
-            savedInstanceState.getDouble(STATE_OPERAND1)
-        else
-            null
-        pendingOperator = savedInstanceState.getString(STATE_PENDING_OPERATION)!!
     }
 }
