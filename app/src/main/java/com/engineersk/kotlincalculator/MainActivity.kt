@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.engineersk.kotlincalculator.viewmodels.CalculatorViewModel
+import com.engineersk.kotlincalculator.viewmodels.BigDecimalViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         mResultTextInputEditText = findViewById(R.id.resultInputEditText)
         mNewNumberInputEditText = findViewById(R.id.rightOperandInputEditText)
-        val viewModel = ViewModelProvider(this).get(CalculatorViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(BigDecimalViewModel::class.java)
 
         viewModel.stringResult.observe(this, { stringResult ->
             mResultTextInputEditText.setText(stringResult)
